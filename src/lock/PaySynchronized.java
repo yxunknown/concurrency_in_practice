@@ -6,6 +6,8 @@ public class PaySynchronized {
 
     private double[] accounts;
 
+    private Object lock = new Object();
+
     public PaySynchronized(int n, double money) {
         accounts = new double[n];
         for (int i = 0; i < n; i++) {
@@ -30,6 +32,14 @@ public class PaySynchronized {
         System.out.println("transfer to account: " + to + ", amount is: " + accounts[to]);
         // 唤醒处于等待的支付线程
         notifyAll();
+    }
+
+    public void safeTransfer(int to, double money) {
+        // 获得某个对象的锁
+        synchronized (lock) {
+            accounts[to] += money;
+            System.out.println("transfer to account: " + to + ", amount is: " + accounts[to]);
+        }
     }
 
     public static void main(String[] args) {
