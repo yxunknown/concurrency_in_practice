@@ -100,3 +100,58 @@ public ThreadPoolExecutor(
 
 ## 线程池类型
 1. FixedThreadPool    
+可重用固定线程数线程池。创建示例：  
+```java
+int nThreads = 10;
+ExecutorService fixedThredPool = new ThreadPoolExecutor(
+    nThreads, // 核心线程数
+    nThreads, // 最大线程数
+    0L,  // 冗余的线程立即被终止
+    TimeUnit.MILLISECONDS, 
+    new LinkedBlockingQueue<Runnable>
+    );
+// 核心线程数和最大线程数相等，表示该线程池没有非核心线程数，而且核心线程的数量是固定的。
+// 当新任务进入该线程池之后，如果没有达到核心线程数，则创建新的核心线程来处理任务。
+// 若达到了核心线程数，则将任务放入队列，等待空闲线程来处理。
+```
+2. CachedThreadPool
+CachedThreadPool线程池是一个根据需要创建线程的线程池。  
+```java
+ExecutorService cachedThreadPool = new ThreadPoolExecutor(
+    0,  // 核心线程数
+    Interger.MAX_VALUE,  // 最大线程数，
+    60L, 
+    TimeUnit.SECONDS,
+    new SynchronousQueue<Runnable>()
+    );
+// 该线程池没有核心线程，但非核心线程数量很多。当空闲线程等待60s还未执行新任务时，
+// 则会被回收。而任务队列使用SynchronousQueue,该队列不存储任何元素，每插入一个任务
+// 都要等待一个非核心线程来执行该任务；同理，在非核心线程请求任务的时候，也要等待新的
+// 任务进入队列。
+```
+3. SingleThreadExecutor  
+使用单个线程执行任务的线程池。创建代码如下：  
+```java
+ExecutorService singleThreadPool = new ThreadPoolExecutor(
+    1,  // core size
+    1,  // max size
+    0L, 
+    TimeUnit.MILLSECONDS,
+    new linkedBlocingQueue<Runnable>()
+    )
+ // 该线程池只有一个核心线程，没有非核心线程。
+ // 当任务提交到该线程池后，如果没有创建核心线程，则创建一个核心线程支持该任务；
+ // 否则则将任务放入队列，由核心线程依次执行。
+```
+4. ScheduledThreadPool
+实现定时和周期性执行任务的线程池。  
+```java
+ExxcutorService scheduledThreadPool = new ThreadPoolExecutor(
+    10,  // core size, can change to fit meet
+    Integer.MAX_VALUE,
+    60,  // keep alive time, can change
+    TimeUnit.MILLSECONDS,
+    new DelayedQueue<Runnable>()
+    )
+// 这里主要使用DelayedQueue来实现定时任务和周期性任务
+```
