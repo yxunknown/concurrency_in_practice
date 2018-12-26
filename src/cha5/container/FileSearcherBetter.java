@@ -21,6 +21,10 @@ public class FileSearcherBetter {
         Set<File> indexedFiles = new HashSet<>();
         fixedThreadPool.execute(new FileSearcherWorker(fileQueue, filter, root, indexedFiles, fixedThreadPool));
         new Thread(new Indexer(fileQueue)).start();
+        new Thread(new Indexer(fileQueue)).start();
+        new Thread(new Indexer(fileQueue)).start();
+        new Thread(new Indexer(fileQueue)).start();
+        new Thread(new Indexer(fileQueue)).start();
 
 
 
