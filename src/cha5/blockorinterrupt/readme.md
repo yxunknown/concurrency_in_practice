@@ -1,0 +1,20 @@
+# 阻塞与中断方法
+线程会因为阻塞而暂停执行。当线程阻塞时，线程通常被挂起，并处于
+某着阻塞状态（BLOCKED WAITING TIMED_WAITING）,阻塞操作
+与耗时操作的区别在于阻塞需要等他一个不收该线程控制的事件发生后，
+该线程才会被置回RUNNABLE状态，并可以被再次调度执行。
+
+当某方法抛出InterruptedException时，表示该方法是一个阻塞方法。
+如果在代码中调用一个会抛出InterruptedException的方法时，该方法
+就会变成一个阻塞方法，必须对该异常进行处理。对于库代码来说，有两种选择：
+1. 传递InterruptedException
+把InterruptedException传递给方法的调用者；或者捕获该异常，执行某些
+清理工作后再次抛出该异常。
+2. 恢复中断
+某些时候不能抛出InterruptedException；比如代码是Runnable的一部分时，
+必须捕获InterruptedException，并通过调用当前线程的interrupt方法
+恢复中断状态，这样在调用栈的更高层代码就可以看到引发了一个中断。*见
+RecoverInterrupt*
+
+在捕获到InterruptedException异常后，最糟糕的做法就是不进行任何处理。
+

@@ -25,9 +25,6 @@ public class FileSearcherBetter {
         new Thread(new Indexer(fileQueue)).start();
         new Thread(new Indexer(fileQueue)).start();
         new Thread(new Indexer(fileQueue)).start();
-
-
-
     }
 }
 
