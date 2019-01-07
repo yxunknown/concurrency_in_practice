@@ -83,7 +83,7 @@ public ThreadPoolExecutor(
     long keepAliveTime, // 非核心线程的闲置时间，闲置时间超过该值的非核心线程会被回收
     TimeUnit unit, // 闲置时间单位
     BlockingQueue<Runnable> workQueue, // 任务队里，如果当前任务数大于corePoolSize，则会将多余的线程放该对队列
-    ThreadFactory threadFactory,  // 线程工程，为每个新建的线程设置名字
+    ThreadFactory threadFactory,  // 线程工厂，为每个新建的线程设置名字
     RejectedExecutionHandler handler // 任务队里满了时的应对策略
 )
 // RejectedExecutorHandler的取值， 线程池的饱和策略

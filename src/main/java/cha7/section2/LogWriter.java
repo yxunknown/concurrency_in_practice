@@ -19,10 +19,8 @@ package cha7.section2;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.time.Instant;
-import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
 /**
  * write some description here
@@ -36,8 +34,10 @@ public class LogWriter {
 
     private final LoggerThread logger;
 
-    public LogWriter(Writer writer) {
-        this.logger = new LoggerThread(writer);
+    public volatile boolean shutdownRequest = false;
+
+    public LogWriter(PrintWriter writer) {
+        this.logger = new LoggerThread(writer, this.queue);
         start();
     }
 
@@ -47,41 +47,55 @@ public class LogWriter {
 
     public void log(String msg) {
         try {
-            this.queue.put(msg);
+            if (!shutdownRequest) {
+                this.queue.put("LOGGER INFO " + msg);
+            } else {
+                // 不可靠的关闭服务
+                throw new IllegalStateException("Logger is shut down");
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
-    private class LoggerThread extends Thread {
-
-        private final PrintWriter writer;
-
-        LoggerThread(Writer writer) {
-            this.writer = new PrintWriter(writer);
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    writer.println(LogWriter.this.queue.take());
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } finally {
-                writer.close();
-            }
-        }
-    }
-
     public static void main(String[] args) {
         PrintWriter w = new PrintWriter(System.out, true);
-        w.println("xxxx");
-        LogWriter logWriter = new LogWriter(new PrintWriter(System.out, true));
+        LogWriter logWriter = new LogWriter(w);
         for (int i = 0; i < 100; i++) {
             logWriter.log(Thread.currentThread().getName() + " " + Instant.now() + " " + i);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
+    }
+}
+
+class LoggerThread extends Thread {
+
+    private final PrintWriter writer;
+    private final BlockingQueue<String> queue;
+
+    LoggerThread(PrintWriter writer, BlockingQueue<String> queue) {
+        this.writer = writer;
+        this.queue = queue;
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                // 日志线程模式存在的一个问题：
+                // 当处理日志的速度远远慢于接收日志的速度时
+                // 那些时候日志服务的客户端会被阻塞
+                writer.println(this.queue.take());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            writer.close();
+        }
     }
 }
