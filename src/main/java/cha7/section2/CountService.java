@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cha7;
+package cha7.section2;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
